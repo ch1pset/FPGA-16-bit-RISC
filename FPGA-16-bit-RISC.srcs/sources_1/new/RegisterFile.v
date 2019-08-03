@@ -39,7 +39,5 @@ module RegisterFile(
         if(Rp_rd) Rp_data = REG[Rp_addr];
 
         if(Rq_rd) Rq_data = REG[Rq_addr];
-
-        
     end
 endmodule

@@ -23,7 +23,7 @@
 module Memory(
     input [7:0] addr,
     input [15:0] data_in,
-    input RW,
+    input read, write,
     input clk,
     output reg [15:0] data_out
     );
@@ -33,9 +33,7 @@ module Memory(
 
     always@(posedge clk)
     begin
-        case(RW)
-        0: data_out = MEM[addr];
-        1: MEM[addr] = data_in;
-        endcase
+        if(read) data_out = MEM[addr];
+        if(write) MEM[addr] = data_in;
     end
 endmodule
