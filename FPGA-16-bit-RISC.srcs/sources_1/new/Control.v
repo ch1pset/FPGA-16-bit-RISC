@@ -22,10 +22,8 @@
 
 module Controller (
     input [15:0] instr,
-    input Rs_zero,
-    input clk,
-    output [7:0] Mem_addr,
-    output [7:0] Rd_data,
+    input Rs_zero, clk,
+    output [7:0] Mem_addr, Rd_data,
     output [3:0] Rd_addr, Rs_addr, Rt_addr,
     output [2:0] ALU_sel,
     output reg [1:0] Rd_sel,
@@ -40,21 +38,14 @@ module Controller (
                 LI  = 8,  LW  = 9,  SW  = 10, BIZ = 11,
                 BNZ = 12, JAL = 13, JMP = 14, JR  = 15;
 
-    parameter   S_idle  = 0,
-                S_fet0  = 1,
-                S_fet1  = 2,
+    parameter   S_idle  = 0, 
+                S_fet0  = 1, S_fet1  = 2,
                 S_dec   = 3,
-                S_Rd_w  = 4,
-                S_Mem_w = 5,
-                S_PC_ld = 6;
+                S_Rd_w  = 4, S_Mem_w = 5, S_PC_ld = 6;
 
-    parameter   Rd_ALU  = 0,
-                Rd_MEM  = 1,
-                Rd_IMM  = 2,
-                Rd_PC   = 3;
+    parameter   Rd_ALU  = 0, Rd_MEM  = 1, Rd_IMM  = 2, Rd_PC   = 3;
 
-    parameter   M_PC    = 0,
-                M_addr  = 1;
+    parameter   M_PC    = 0, M_addr  = 1;
 
     reg [3:0] state = 0;
     reg Rs_sel = 0;
@@ -71,9 +62,9 @@ module Controller (
 
     always@(posedge clk)
     begin
-        Rd_sel = 0;     Rs_sel = 0;
+        Rs_sel = 0;
         Rd_write = 0;   Rs_read = 0;    Rt_read = 0;
-        Mem_sel = 0;    Mem_read = 0;   Mem_write = 0;
+        Mem_read = 0;   Mem_write = 0;
         PC_load = 0;    PC_clr = 0;     PC_inc = 0;
         Offset_sel = 0;
         IR_load = 0;
@@ -130,7 +121,7 @@ module Controller (
             BIZ, BNZ: begin
                 Rs_sel = 1;
                 Rs_read = 1;
-                state = S_BIZ;
+                state = S_PC_ld;
             end
 
             JAL: begin
