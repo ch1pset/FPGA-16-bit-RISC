@@ -20,22 +20,33 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ALU(
+module ALU #(parameter
+    ADD = 3'o0,
+    SUB = 3'o1,
+    AND = 3'o2,
+    OR  = 3'o3,
+    XOR = 3'o4,
+    NOT = 3'o5,
+    SHL = 3'o6,
+    SHR = 3'o7) (
     input [15:0] A, B,
     input [2:0] OP,
-    output [15:0] Data
+    output reg [15:0] Data,
+    output reg zero
     );
-    
-    wire [15:0] mux [7:0];
-
-    assign mux[0] = A + B;
-    assign mux[1] = A - B;
-    assign mux[2] = A & B;
-    assign mux[3] = A | B;
-    assign mux[4] = A ^ B;
-    assign mux[5] = ~A;
-    assign mux[6] = A << 1;
-    assign mux[7] = A >> 1;
-
-    assign Data = mux[OP];
+    always@(OP, A, B)
+    begin
+        case(OP)
+        ADD:   Data = A + B;
+        SUB:   Data = A - B;
+        AND:   Data = A & B;
+        OR:    Data = A | B;
+        XOR:   Data = A ^ B;
+        NOT:   Data = ~A;
+        SHL:   Data = A << 1;
+        SHR:   Data = A >> 1;
+        endcase
+        if(A == 0) zero = 1;
+        else zero = 0;
+    end
 endmodule
