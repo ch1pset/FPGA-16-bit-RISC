@@ -20,20 +20,13 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ALU #(parameter
-    ADD = 3'o0,
-    SUB = 3'o1,
-    AND = 3'o2,
-    OR  = 3'o3,
-    XOR = 3'o4,
-    NOT = 3'o5,
-    SHL = 3'o6,
-    SHR = 3'o7) (
+module ALU (
     input [15:0] A, B,
     input [2:0] OP,
-    output reg [15:0] Data,
-    output reg zero
+    output reg [15:0] Data
     );
+    parameter   ADD = 0, SUB = 1, AND = 2, OR  = 3,
+                XOR = 4, NOT = 5, SHL = 6, SHR = 7;
     always@(OP, A, B)
     begin
         case(OP)
@@ -46,7 +39,5 @@ module ALU #(parameter
         SHL:   Data = A << 1;
         SHR:   Data = A >> 1;
         endcase
-        if(A == 0) zero = 1;
-        else zero = 0;
     end
 endmodule
