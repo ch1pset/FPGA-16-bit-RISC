@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Program_Counter(in, clk, count, PC_ld, PC_clr, PC_inc);
+module Program_Counter(in, PC_ld, PC_clr, PC_inc, clk, count);
     input [7:0] in;
     input clk, PC_ld, PC_clr, PC_inc;
     output reg [7:0] count;

@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Instruction_Register(clk, INSTR, in, IR_ld);
+module Instruction_Register(in, IR_ld, clk, INSTR);
 input [15:0] in;
 input clk, IR_ld;
 output reg [15:0] INSTR;
