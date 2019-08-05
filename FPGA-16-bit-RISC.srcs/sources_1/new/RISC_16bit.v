@@ -36,7 +36,7 @@ module RISC_16bit(
     wire Mux_addr_sel, Mem_read, Mem_write;
 
     ControlUnit CU(
-        Instr,
+        Instr, Mem_data,
         Rs_zero, clk,
         Rd_data, PC_addr,
         ALU_sel, Rd_sel,
@@ -63,7 +63,8 @@ module RISC_16bit(
 endmodule
 
 module ControlUnit (
-    input [15:0] Instr,
+    input [15:0] Mem_out,
+    input [15:0] Rs_out,
     input Rs_zero, clk,
     output [7:0] Rd_data, PC_addr,
     output [2:0] ALU_sel,
@@ -72,11 +73,10 @@ module ControlUnit (
     output Rd_write, Rs_read, Rt_read,
     output Mux_addr_sel, Mem_read, Mem_write
     );
-    wire [15:0] Instr_out;
+    wire [15:0] Instr_mux, Instr_out;
     wire [7:0] Offset_out;
     wire PC_load, PC_clr, PC_inc;
-    wire Offset_sel;
-    wire IR_load;
+    wire IR_sel, IR_load;
     
     Controller CON(
         Instr_out, Rs_zero, clk,
@@ -85,8 +85,7 @@ module ControlUnit (
         ALU_sel, Rd_sel,
         Rd_write, Rs_read, Rt_read,
         PC_load, PC_clr, PC_inc,
-        Offset_sel,
-        IR_load,
+        IR_sel, IR_load,
         Mux_addr_sel, Mem_read, Mem_write
     );
     Program_Counter PC(
@@ -95,14 +94,19 @@ module ControlUnit (
         clk,
         PC_addr
     );
+    Offset OFF(
+        PC_addr, Instr_out[7:0],
+        Offset_out
+    );
     Instruction_Register IR(
-        Instr, IR_load, 
+        Instr_mux, IR_load, 
         clk, 
         Instr_out
     );
-    Offset OFF(
-        PC_addr, Instr_out[7:0],
-        Offset_sel, Offset_out
+    Mux #(16, 2) IR_Mux(
+        {Rs_out, Mem_out},
+        IR_sel,
+        Instr_mux
     );
 endmodule
 
@@ -132,7 +136,7 @@ module ProcessorUnit (
         ALU_sel, ALU_out
     );
     Mux16_4x1 RF_Mux(
-        {PC_addr, Rd_data, Instr, ALU_out},
+        {PC_addr - 1, Rd_data, Instr, ALU_out},
         Rd_sel,
         RF_mux
     );
