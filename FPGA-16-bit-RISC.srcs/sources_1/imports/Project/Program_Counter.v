@@ -23,7 +23,7 @@
 module Program_Counter(in, PC_ld, PC_clr, PC_inc, clk, count);
     input [7:0] in;
     input clk, PC_ld, PC_clr, PC_inc;
-    output reg [7:0] count;
+    output reg [7:0] count = 8'h00;
 
     always@(posedge clk)
     begin
