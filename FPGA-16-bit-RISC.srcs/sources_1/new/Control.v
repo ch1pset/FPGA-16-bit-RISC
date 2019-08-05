@@ -22,11 +22,12 @@
 
 module Controller (
     input [15:0] instr,
-    input Rs_zero, clk,
+    input Rs_zero, clk, rst,
     output [7:0] Rd_data,
     output [3:0] Rd_addr, Rs_addr, Rt_addr,
     output [2:0] ALU_sel,
     output reg [1:0] Rd_sel,
+    output reg Rs_sel = 0,
     output reg Rd_write, Rs_read, Rt_read,
     output reg PC_load, PC_clr, PC_inc,
     output reg IR_sel, IR_load,
@@ -57,8 +58,8 @@ module Controller (
 
     parameter   M_PC    = 0, M_addr  = 1;
 
-    reg [3:0] state = 0;
-    reg Rs_sel = 0;
+    reg [5:0] state = 0;
+    // reg Rs_sel = 0;
     wire [3:0] OP_code;
 
     
@@ -77,7 +78,7 @@ module Controller (
         IR_load = 0;
 
         case(state)
-        S_idle: state = S_fet0;
+        S_idle: if(~rst) state = S_fet0;
 
         S_fet0: begin
             Mem_sel = M_PC;
@@ -137,7 +138,6 @@ module Controller (
             end
 
             JR: begin
-                Rs_read = 1;
                 IR_sel = 1;
                 state = S_ex_JR0;
             end

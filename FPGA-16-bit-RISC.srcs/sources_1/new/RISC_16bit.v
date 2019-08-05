@@ -21,9 +21,9 @@
 
 
 module RISC_16bit(
-    input clk
+    input clk, rst,
+    output [15:0] Instr, Mem_data
     );
-    wire [15:0] Instr, Mem_data;
     wire Rs_zero;
     wire [7:0] PC_addr, Offset_out, Rd_data;
     wire [3:0] Rd_addr, Rs_addr, Rt_addr;
@@ -37,7 +37,7 @@ module RISC_16bit(
 
     ControlUnit CU(
         Instr, Mem_data,
-        Rs_zero, clk,
+        Rs_zero, clk, rst,
         Rd_data, PC_addr,
         ALU_sel, Rd_sel,
         Rd_addr, Rs_addr, Rt_addr,
