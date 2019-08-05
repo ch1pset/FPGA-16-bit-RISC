@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module Mux16_3x1(
-    input [15:0] bus [2:0],
+    input [15:0] bus [3:0],
     input [1:0] sel,
     output [15:0] dout
     );
@@ -29,7 +29,7 @@ module Mux16_3x1(
     assign sign_extend[14:7] = 8'h00;
     assign sign_extend[6:0] = (~bus[2][6:0]) + 1;
 
-    Mux #(16, 4) M0({0, sign_extend, bus[1], bus[0]}, sel, dout);
+    Mux #(16, 4) M0({bus[3], sign_extend, bus[1], bus[0]}, sel, dout);
 endmodule
 
 module Mux(bus, sel, dout);
