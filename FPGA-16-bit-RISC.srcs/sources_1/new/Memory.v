@@ -28,8 +28,8 @@ module Memory(
     output reg [15:0] data_out
     );
     reg [15:0] MEM [255:0];
-    integer i;
-    initial for(i = 0; i < 256; i = i + 1) MEM[i] = 16'h0000;
+    // integer i;
+    // initial for(i = 0; i < 256; i = i + 1) MEM[i] = 16'h0000;
 
     always@(posedge clk)
     begin
