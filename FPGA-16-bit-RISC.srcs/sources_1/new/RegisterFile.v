@@ -21,23 +21,26 @@
 
 
 module RegisterFile(
-    input [15:0] w_data,
-    input [3:0] w_addr,
-    input w_wr,
-    input [3:0] Rp_addr,
-    input Rp_rd,
-    input [3:0] Rq_addr,
-    input Rq_rd,
+    input [15:0] dest_data,
+    input [3:0] dest_addr,
+    input dest_write,
+    input [3:0] src_addr,
+    input src_read,
+    input [3:0] tar_addr,
+    input tar_read,
     input clk,
-    output reg [15:0] Rp_data, Rq_data
+    output reg [15:0] src_data, tar_data,
+    output reg src_zero
     );
     reg [15:0] REG [15:0];
     always@(posedge clk)
     begin
-        if(w_wr) REG[w_addr] = w_data;
+        if(dest_write) REG[dest_addr] = dest_data;
 
-        if(Rp_rd) Rp_data = REG[Rp_addr];
+        if(src_read) src_data = REG[src_addr];
 
-        if(Rq_rd) Rq_data = REG[Rq_addr];
+        if(tar_read) tar_data = REG[tar_addr];
+
+        src_zero = (src_data == 0);
     end
 endmodule
