@@ -27,9 +27,23 @@ module Memory(
     input clk,
     output reg [15:0] data_out
     );
+    // parameter ADD = 0, SUB = 1, AND = 2, OR = 3,
+    //           XOR = 4, NOT = 5, SLA = 6, SRA = 7,
+    //           LI = 8, LW = 9, SW = 10, BIZ = 11,
+    //           BNZ = 12, JAL = 13, JMP = 14, JR = 15;
     reg [15:0] MEM [255:0];
-    // integer i;
-    // initial for(i = 0; i < 256; i = i + 1) MEM[i] = 16'h0000;
+    
+    initial
+    begin
+        MEM[0] = 16'h8005;
+        MEM[1] = 16'h8107;
+        MEM[2] = 16'h0201;
+        MEM[3] = 16'h5300;
+        MEM[4] = 16'hE000;
+        MEM[5] = 16'h0000;
+        MEM[6] = 16'h0000;
+        MEM[7] = 16'h0000;
+    end
 
     always@(posedge clk)
     begin
