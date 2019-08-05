@@ -23,16 +23,15 @@
 module Offset(
     input [7:0] instr_ptr,
     input [7:0] offset_addr,
+    input offset_sel,
     output [7:0] instr_off_ptr
     );
-    wire [7:0] offset;
-    wire sign = (offset_addr > instr_ptr);
-
-    assign offset = sign ? 
-        (offset_addr - instr_ptr): 
-        (instr_ptr - offset_addr);
-
-    assign instr_off_ptr = sign ?
-        (instr_ptr + offset - 1):
-        (instr_ptr - offset - 1);
+    wire [7:0] offset, shift, pc, bg, sm;
+    assign pc = instr_ptr - 1;
+    wire sign = (offset_addr > pc);
+    Mux #(8, 2) set_bg     ({offset_addr, pc}, sign, bg);
+    Mux #(8, 2) set_sm     ({pc, offset_addr}, sign, sm);
+    assign offset = bg - sm;
+    Mux #(8, 2) shift_mux  ({(pc + offset),         (pc - offset)},      sign,         shift);
+    Mux #(8, 2) output_mux ({offset_addr,           shift},              offset_sel,   instr_off_ptr);
 endmodule
