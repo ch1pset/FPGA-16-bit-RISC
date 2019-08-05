@@ -23,7 +23,7 @@
 module Controller (
     input [15:0] instr,
     input Rs_zero, clk,
-    output [7:0] Mem_addr, Rd_data,
+    output [7:0] Rd_data,
     output [3:0] Rd_addr, Rs_addr, Rt_addr,
     output [2:0] ALU_sel,
     output reg [1:0] Rd_sel,
@@ -54,7 +54,6 @@ module Controller (
     
     assign OP_code  = instr[15:12];
     assign ALU_sel  = instr[14:12];
-    assign Mem_addr = instr[7:0];
     assign Rd_data  = instr[7:0];
     assign Rd_addr  = instr[11:8];
     assign Rs_addr  = Rs_sel ? Rd_addr : instr[7:4];
