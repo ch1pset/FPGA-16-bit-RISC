@@ -29,8 +29,7 @@ module Controller (
     output reg [1:0] Rd_sel,
     output reg Rd_write, Rs_read, Rt_read,
     output reg PC_load, PC_clr, PC_inc,
-    output reg Offset_sel,
-    output reg IR_load,
+    output reg IR_sel, IR_load,
     output reg Mem_sel, Mem_read, Mem_write
     );
     parameter   ADD = 0,  SUB = 1,  AND = 2,  OR  = 3,
@@ -38,10 +37,21 @@ module Controller (
                 LI  = 8,  LW  = 9,  SW  = 10, BIZ = 11,
                 BNZ = 12, JAL = 13, JMP = 14, JR  = 15;
 
-    parameter   S_idle  = 0, 
-                S_fet0  = 1, S_fet1  = 2,
-                S_dec   = 3,
-                S_Rd_w  = 4, S_Mem_w = 5, S_PC_ld = 6;
+    parameter   S_idle  = 0, //Idle state
+
+                S_fet0  = 1, S_fet1  = 2, //fetch state
+                
+                S_dec   = 3, //decode state
+
+                //Execute state
+                S_ex_ALU0 = 4, S_ex_ALU1 = 5, S_ex_ALU2 = 6,
+                S_ex_LI = 7,
+                S_ex_LW0 = 8, S_ex_LW1 = 9,
+                S_ex_SW0 = 10, S_ex_SW1 = 11,
+                S_ex_BZ = 12, S_ex_BIZ = 13, S_ex_BNZ = 14,
+                S_ex_JAL0 = 15, S_ex_JAL1 = 16,
+                S_ex_JMP0 = 17, S_ex_JMP1 = 18,
+                S_ex_JR0 = 19, S_ex_JR1 = 20, S_ex_JR2 = 21;
 
     parameter   Rd_ALU  = 0, Rd_MEM  = 1, Rd_IMM  = 2, Rd_PC   = 3;
 
@@ -61,13 +71,10 @@ module Controller (
 
     always@(posedge clk)
     begin
-        Rs_sel = 0;
         Rd_write = 0;   Rs_read = 0;    Rt_read = 0;
         Mem_read = 0;   Mem_write = 0;
         PC_load = 0;    PC_clr = 0;     PC_inc = 0;
-        Offset_sel = 0;
         IR_load = 0;
-
 
         case(state)
         S_idle: state = S_fet0;
@@ -79,6 +86,8 @@ module Controller (
         end
 
         S_fet1: begin
+            IR_sel = 0;
+            Rs_sel = 0;
             IR_load = 1;
             PC_inc = 1;
             state = S_dec;
@@ -88,75 +97,144 @@ module Controller (
             case(OP_code)
             ADD, SUB, AND, OR, XOR: begin
                 Rd_sel = Rd_ALU;
-                Rs_read = 1;
-                Rt_read = 1;
-                state = S_Rd_w;
+                state = S_ex_ALU0;
             end
 
             NOT, SLA, SRA: begin
                 Rd_sel = Rd_ALU;
-                Rs_read = 1;
-                state = S_Rd_w;
+                state = S_ex_ALU1;
             end
 
             LI: begin
                 Rd_sel = Rd_IMM;
-                state = S_Rd_w;
+                state = S_ex_LI;
             end
 
             LW: begin
                 Mem_sel = M_addr;
                 Rd_sel = Rd_MEM;
-                state = S_Rd_w;
+                state = S_ex_LW0;
             end
 
             SW: begin
                 Mem_sel = M_addr;
                 Rs_sel = 1;
-                Rs_read = 1;
-                state = S_Mem_w;
+                state = S_ex_SW0;
             end
 
             BIZ, BNZ: begin
                 Rs_sel = 1;
-                Rs_read = 1;
-                state = S_PC_ld;
+                state = S_ex_BZ;
             end
 
             JAL: begin
                 Rd_sel = Rd_PC;
-                state = S_Rd_w;
+                state = S_ex_JAL0;
             end
 
-            JMP: state = S_PC_ld;
+            JMP: begin
+                state = S_ex_JMP0;
+            end
 
             JR: begin
                 Rs_read = 1;
-                Offset_sel = 1;
-                state = S_PC_ld;
+                IR_sel = 1;
+                state = S_ex_JR0;
             end
             endcase
         end
 
-        S_Rd_w: begin
-            Rd_write = 1;
-            case(OP_code)
-            JAL:     state = S_PC_ld;
-            default: state = S_idle;
-            endcase
+        S_ex_ALU0: begin
+            Rs_read = 1;
+            Rt_read = 1;
+            state = S_ex_ALU2;
         end
 
-        S_Mem_w: begin
+        S_ex_ALU1: begin
+            Rs_read = 1;
+            state = S_ex_ALU2;
+        end
+
+        S_ex_ALU2: begin
+            Rd_write = 1;
+            state = S_idle;
+        end
+
+        S_ex_LI: begin
+            Rd_write = 1;
+            state = S_idle;
+        end
+
+        S_ex_LW0: begin
+            Mem_read = 1;
+            state = S_ex_LW1;
+        end
+
+        S_ex_LW1: begin
+            Rd_write = 1;
+            state = S_idle;
+        end
+
+        S_ex_SW0: begin
+            Rs_read = 1;
+            state = S_ex_SW1;
+        end
+
+        S_ex_SW1: begin
             Mem_write = 1;
             state = S_idle;
         end
 
-        S_PC_ld: begin
+        S_ex_BZ: begin
+            Rs_read = 1;
             case(OP_code)
-            BIZ:     PC_load = Rs_zero;
-            BNZ:     PC_load = ~Rs_zero;
-            default: PC_load = 1;
+                BIZ: state = S_ex_BIZ;
+                BNZ: state = S_ex_BNZ;
             endcase
+        end
+
+        S_ex_BIZ: begin
+            PC_load = Rs_zero;
+            state = S_idle;
+        end
+
+        S_ex_BNZ: begin
+            PC_load = ~Rs_zero;
+            state = S_idle;
+        end
+
+        S_ex_JAL0: begin
+            Rd_write = 1;
+            state = S_ex_JAL1;
+        end
+
+        S_ex_JAL1: begin
+            PC_load = 1;
+            state = S_idle;
+        end
+
+        S_ex_JMP0: begin
+            IR_load = 1;
+            state = S_ex_JMP1;
+        end
+
+        S_ex_JMP1: begin
+            PC_load = 1;
+            state = S_idle;
+        end
+
+        S_ex_JR0: begin
+            Rs_read = 1;
+            state = S_ex_JR1;
+        end
+
+        S_ex_JR1: begin
+            IR_load = 1;
+            state = S_ex_JR2;
+        end
+
+        S_ex_JR2: begin
+            PC_load = 1;
             state = S_idle;
         end
         endcase
