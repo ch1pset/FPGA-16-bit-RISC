@@ -23,9 +23,9 @@
 module Instruction_Register(in, IR_ld, clk, INSTR);
 input [15:0] in;
 input clk, IR_ld;
-output reg [15:0] INSTR;
+output reg [15:0] INSTR = 0;
 always @ (posedge clk)
 begin
-if (IR_ld==1) INSTR<=in;
+if (IR_ld==1) INSTR = in;
 end
 endmodule
