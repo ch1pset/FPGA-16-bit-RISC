@@ -28,10 +28,10 @@ module Controller (
     output [2:0] ALU_sel,
     output reg [1:0] Rd_sel = 0,
     output reg Rs_sel = 0,
-    output reg Rd_write, Rs_read, Rt_read,
-    output reg PC_load, PC_clr, PC_inc,
-    output reg IR_sel, IR_load,
-    output reg Mem_sel, Mem_read, Mem_write
+    output reg Rd_write = 0, Rs_read = 0, Rt_read = 0,
+    output reg PC_load = 0, PC_clr = 0, PC_inc = 0,
+    output reg IR_sel = 0, IR_load = 0,
+    output reg Mem_sel = 0, Mem_read = 0, Mem_write = 0
     );
     parameter   //Opcodes
                 ADD     = 0, SUB    = 1,  AND       = 2,  OR    = 3,
@@ -73,52 +73,53 @@ module Controller (
 
         case(state)
         S_idle: begin
-            if(~rst) state = S_fet0;
+            state = S_fet0;
+            Mem_sel = M_PC;
+            IR_sel = IR_mem;
+            Rs_sel = Rs_src;
+            Mem_read = 1;
         end
 
         S_fet0: begin
-            Mem_sel = M_PC;
-            Mem_read = 1;
             state = S_fet1;
+            IR_load = 1;
         end
 
         S_fet1: begin
-            IR_sel = IR_mem;
-            Rs_sel = Rs_src;
-            IR_load = 1;
-            PC_inc = 1;
             state = S_dec;
+            PC_inc = 1;
         end
 
         S_dec: begin
+            state = S_ex0;
             case(OP_code)
             ADD, SUB,
             AND, OR, XOR: Rd_sel = Rd_ALU;
 
             NOT, SLA, SRA: Rd_sel = Rd_ALU;
 
-            LI: Rd_sel = Rd_IMM;
+            LI: begin
+                Rd_sel = Rd_IMM;
+            end
 
             LW: begin
                 Mem_sel = M_addr;
                 Rd_sel = Rd_MEM;
             end
 
-            SW: begin
+            SW, BIZ, BNZ: begin
                 Mem_sel = M_addr;
                 Rs_sel = Rs_dest;
             end
-
-            BIZ, BNZ: Rs_sel = Rs_dest;
 
             JAL: Rd_sel = Rd_PC;
             // JMP: 
             JR: IR_sel = IR_rs;
             endcase
-            state = S_ex0;
         end
 
         S_ex0: begin
+            state = S_ex1;
             case(OP_code)
             ADD, SUB, 
             AND, OR, XOR: begin
@@ -135,10 +136,10 @@ module Controller (
 
             JMP: IR_load = 1;
             endcase
-            state = S_ex1;
         end
 
         S_ex1: begin
+            state = S_ex2;
             case(OP_code)
             ADD, SUB, AND,
             OR, XOR, NOT,
@@ -146,28 +147,29 @@ module Controller (
 
             SW: Mem_write = 1;
 
-            BIZ: PC_load = Rs_zero;
-
-            BNZ: PC_load = ~Rs_zero;
-
             JAL, JMP: PC_load = 1;
 
             JR: IR_load = 1;
             endcase
-            state = S_ex2;
         end
 
         S_ex2: begin
-            if(OP_code == JR) PC_load = 1;
             state = S_done;
+            case(OP_code)
+            JR: PC_load = 1;
+
+            BIZ: PC_load = Rs_zero;
+
+            BNZ: PC_load = ~Rs_zero;
+            endcase
         end
 
         S_done: begin
+            state = S_idle;
             Rd_sel = Rd_ALU;
             Rs_sel = Rs_src;
             Mem_sel = M_PC;
             IR_sel = IR_mem;
-            state = S_idle;
         end
 
         endcase
