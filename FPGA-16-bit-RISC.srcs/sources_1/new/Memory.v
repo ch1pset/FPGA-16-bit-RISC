@@ -33,17 +33,15 @@ module Memory(
     //           BNZ = 12, JAL = 13, JMP = 14, JR = 15;
     reg [15:0] MEM [255:0];
     
-    initial
-    begin
-        MEM[0] = 16'h8005;
-        MEM[1] = 16'h8107;
-        MEM[2] = 16'h0201;
-        MEM[3] = 16'h5300;
-        MEM[4] = 16'hE000;
-        MEM[5] = 16'h0000;
-        MEM[6] = 16'h0000;
-        MEM[7] = 16'h0000;
-    end
+    // initial
+    // begin
+    //     MEM[0] = 16'h8005;
+    //     MEM[1] = 16'h8107;
+    //     MEM[2] = 16'h0201;
+    //     MEM[3] = 16'h1310;
+    //     MEM[4] = 16'ha206;
+    //     MEM[5] = 16'ha307;
+    // end
 
     always@(posedge clk)
     begin
