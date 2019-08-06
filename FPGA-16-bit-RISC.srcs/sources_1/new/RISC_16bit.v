@@ -21,9 +21,9 @@
 
 
 module RISC_16bit(
-    input clk, rst,
-    output [15:0] Instr, Mem_data
+    input clk, rst
     );
+    wire [15:0] Instr, Mem_data;
     wire Rs_zero;
     wire [7:0] PC_addr, Offset_out, Rd_data;
     wire [3:0] Rd_addr, Rs_addr, Rt_addr;
@@ -46,12 +46,15 @@ module RISC_16bit(
         Mem_sel, Mem_read, Mem_write
     );
     ProcessorUnit PU(
-        Instr, Rd_data, PC_addr,
-        ALU_sel, Rd_sel,
+        Instr,
+        Rd_data, PC_addr,
+        ALU_sel,
+        Rd_sel,
         Rd_addr, Rs_addr, Rt_addr,
         Rd_write, Rs_read, Rt_read,
         clk,
-        Mem_data, Rs_zero
+        Mem_data,
+        Rs_zero
     );
     MemoryUnit MU(
         Mem_data,
@@ -139,8 +142,8 @@ module ProcessorUnit (
         Rs_out, Rt_out,
         ALU_sel, ALU_out
     );
-    Mux16_4 RF_Mux(
-        PC_addr - 1, Rd_data, Instr, ALU_out,
+    Mux_4 #(16) RDSEL(
+        {8'h00, (PC_addr)}, {8'h00, Rd_data}, Instr, ALU_out,
         Rd_sel,
         RF_mux
     );
