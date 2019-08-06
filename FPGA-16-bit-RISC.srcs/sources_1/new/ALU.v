@@ -23,7 +23,7 @@
 module ALU (
     input [15:0] A, B,
     input [2:0] OP,
-    output reg [15:0] Data
+    output reg [15:0] Data = 0
     );
     parameter   ADD = 0, SUB = 1, AND = 2, OR  = 3,
                 XOR = 4, NOT = 5, SHL = 6, SHR = 7;
