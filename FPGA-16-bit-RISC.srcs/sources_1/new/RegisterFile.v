@@ -29,10 +29,15 @@ module RegisterFile(
     input [3:0] tar_addr,
     input tar_read,
     input clk,
-    output reg [15:0] src_data, tar_data,
-    output reg src_zero
+    output reg [15:0] src_data = 0, tar_data = 0,
+    output src_zero
     );
     reg [15:0] REG [15:0];
+    integer i = 0;
+    initial for(i = 0; i < 16; i = i + 1) REG[i] = 0;
+
+    assign src_zero = (src_data == 0);
+
     always@(posedge clk)
     begin
         if(dest_write) REG[dest_addr] = dest_data;
@@ -40,7 +45,5 @@ module RegisterFile(
         if(src_read) src_data = REG[src_addr];
 
         if(tar_read) tar_data = REG[tar_addr];
-
-        src_zero = (src_data == 0);
     end
 endmodule
