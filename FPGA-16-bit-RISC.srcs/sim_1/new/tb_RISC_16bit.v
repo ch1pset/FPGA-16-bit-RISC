@@ -22,12 +22,12 @@
 
 module tb_RISC_16bit( );
     parameter   //Instruction Set
-    ADD = (0 << 12), SUB = (1 << 12),
-    AND = (2 << 12), OR = (3 << 12), XOR = (4 << 12),
-    NOT = (5 << 12), SLA = (6 << 12), SRA = (7 << 12),
-    LI = (8 << 12), LW = (9 << 12), SW = (10 << 12),
-    BIZ = (11 << 12), BNZ = (12 << 12),
-    JAL = (13 << 12), JMP = (14 << 12), JR = (15 << 12),
+    ADD = 0 , SUB = 1 ,
+    AND = 2 , OR  = 3 , XOR = 4 ,
+    NOT = 5 , SLA = 6 , SRA = 7 ,
+    LI  = 8 , LW  = 9 , SW  = 10,
+    BIZ = 11, BNZ = 12,
+    JAL = 13, JMP = 14, JR  = 15,
 
     Rd = (1 << 8), Rs = (1 << 4), Rt = 1, Byte = 1;
 
@@ -62,25 +62,31 @@ module tb_RISC_16bit( );
 
     initial
     begin
-        UUT1.MU.RAM.MEM[0] = LI  + (Rd * 0)  + (Byte * 5);
-        UUT1.MU.RAM.MEM[1] = LI  + (Rd * 1)  + (Byte * 7);
-        UUT1.MU.RAM.MEM[2] = ADD + (Rd * 2)  + (Rs * 0)      + (Rt * 1);
-        UUT1.MU.RAM.MEM[3] = SUB + (Rd * 3)  + (Rs * 1)      + (Rt * 0);
-        UUT1.MU.RAM.MEM[4] = LW  + (Rd * 6)  + (Byte * 8);
-        UUT1.MU.RAM.MEM[5] = SW  + (Rd * 6)  + (Byte * 8);
-        UUT1.MU.RAM.MEM[6] = BIZ + (Rd * 6)  + (Byte * 9);
-        UUT1.MU.RAM.MEM[7] = JMP + 0         + (Byte * 11);
-        UUT1.MU.RAM.MEM[8] = 0;
-        UUT1.MU.RAM.MEM[9] = JAL + (Rd * 15) + (Byte * 13);
-        UUT1.MU.RAM.MEM[10]= BNZ + (Rd * 6)  + (Byte * 9);
-        UUT1.MU.RAM.MEM[11]= SLA + (Rd * 6)  + 0;
-        UUT1.MU.RAM.MEM[12]= JMP + 0         + 0;
-        UUT1.MU.RAM.MEM[13]= JR  + 0         + (Rs * 15)    + 0;
+        UUT1.MU.RAM.MEM[0]  = instr( LI,   0,   0, 8'h05     );
+        UUT1.MU.RAM.MEM[1]  = instr( LI,   1,   0, 8'h07     );
+        UUT1.MU.RAM.MEM[2]  = instr( ADD,  2,   0, 1         );
+        UUT1.MU.RAM.MEM[3]  = instr( SUB,  3,   1, 0         );
+        UUT1.MU.RAM.MEM[4]  = instr( LW,   6,   0, 8'h08     );
+        UUT1.MU.RAM.MEM[5]  = instr( SW,   6,   0, 8'h08     );
+        UUT1.MU.RAM.MEM[6]  = instr( BIZ,  6,   0, 8'h09     );
+        UUT1.MU.RAM.MEM[7]  = instr( JMP,  0,   0, 8'h11     );
+        UUT1.MU.RAM.MEM[8]  = 0;
+        UUT1.MU.RAM.MEM[9]  = instr( JAL,  15,  0, 8'h0d     );
+        UUT1.MU.RAM.MEM[10] = instr( BNZ,  6,   0, 8'h09     );
+        UUT1.MU.RAM.MEM[11] = instr( SLA,  6,   3, 0         );
+        UUT1.MU.RAM.MEM[12] = instr( JMP,  0,   0, 8'h00     );
+        UUT1.MU.RAM.MEM[13] = instr( JR,   0,   15,0         );
 
         #400 $finish;
     end
 
     always #1 clk = ~clk;
+
+    function [15:0] instr;
+    input [3:0] op, rd, rs;
+    input [7:0] rt;
+    instr = (op << 12) + (rd << 8) + (rs << 4) + rt;
+    endfunction
 
     task toggleRst;
     begin
