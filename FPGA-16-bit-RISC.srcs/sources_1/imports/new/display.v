@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module RefreshDisplay #(parameter rate) (
+module Display (
     input [31:0] display_data,
     input clk_in,
     input en,
@@ -30,9 +30,9 @@ module RefreshDisplay #(parameter rate) (
     reg [2:0] count = 3'b000;
     wire refresh_trigger;
 
-    SlowClock #(rate)   D_CLK(clk_in, refresh_trigger);
-    AnodeCon            POS_SEL(count, refresh_trigger, en, SSEG_AN);
-    CathodeCon          DIGIT_SEL(display_data[4*count +: 4], refresh_trigger, en, SSEG_CA);
+    SlowClock #(2)   D_CLK(clk_in, refresh_trigger);
+    AnodeCon         POS_SEL(count, refresh_trigger, en, SSEG_AN);
+    CathodeCon       DIGIT_SEL(display_data[4*count +: 4], refresh_trigger, en, SSEG_CA);
     
     always@(posedge refresh_trigger)
     begin
@@ -41,11 +41,10 @@ module RefreshDisplay #(parameter rate) (
     
 endmodule
 
-module SlowClock #(parameter clk_ms) (
+module SlowClock #(parameter clk_ms = 1, ms = 100000) (
     input INCLK,
     output reg OUTCLK = 0
     );
-    parameter ms = 100000;
     reg [15:0] slow;
     always@(posedge INCLK)
     begin

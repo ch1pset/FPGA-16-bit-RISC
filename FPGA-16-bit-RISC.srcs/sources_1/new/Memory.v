@@ -30,17 +30,30 @@ module Memory(
     parameter ADD = 0, SUB = 1, AND = 2, OR = 3,
               XOR = 4, NOT = 5, SLA = 6, SRA = 7,
               LI = 8, LW = 9, SW = 10, BIZ = 11,
-              BNZ = 12, JAL = 13, JMP = 14, JR = 15;
+              BNZ = 12, JAL = 13, JMP = 14, JR = 15,
+
+              PROG = 0, DAT = 64, DISP = 240;
     reg [15:0] MEM [255:0];
     
     initial
     begin
-        MEM[0] = instr(LI, 0, 0, 8'h05);
-        MEM[1] = instr(LI, 1, 0, 8'h07);
-        MEM[2] = instr(ADD, 2, 0, 1);
-        MEM[3] = 16'h1310;
-        MEM[4] = 16'ha206;
-        MEM[5] = 16'ha307;
+        // Program Memory
+        MEM[PROG + 0] = instr(LW,  0, 0, DAT + 0);
+        MEM[PROG + 1] = instr(LW,  1, 0, DAT + 1);
+        // MEM[PROG + 2] = instr();
+        MEM[PROG + 3] = instr(SUB, 2, 0, 1);
+        MEM[PROG + 4] = instr(SW,  2, 0, DAT + 2);
+        MEM[PROG + 5] = instr(BNZ, 2, 0, PROG + 0);
+        // MEM[PROG + 6] = instr();
+        MEM[PROG + 7] = 16'ha307;
+
+        // Data Memory
+        MEM[DAT + 0] = 16'ha0a0;
+        MEM[DAT + 1] = 16'h0f0f;
+
+        // Display Memory
+        MEM[DISP + 0] = 0;
+        MEM[DISP + 1] = 0;
     end
 
     always@(posedge clk)

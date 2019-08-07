@@ -21,9 +21,16 @@
 
 
 module RISC_16bit(
-    input clk, rst
+    input CLK100MHZ, BTNC,
+    output reg [15:0] LED,
+    output [7:0] CA, AN
     );
-    wire [15:0] Instr, Mem_data;
+    parameter [1:0] DISREG = { 14, 15 };
+
+    wire clk = CLK100MHZ, rst = BTNC;
+
+    reg [31:0] disp_data;
+    wire [15:0] Mem_out, Mem_data;
     wire Rs_zero;
     wire [7:0] PC_addr, Offset_out, Rd_data;
     wire [3:0] Rd_addr, Rs_addr, Rt_addr;
@@ -36,8 +43,15 @@ module RISC_16bit(
     wire IR_load;
     wire Mem_sel, Mem_read, Mem_write;
 
+    Display DU(
+        disp_data,
+        clk,
+        1,
+        CA, AN
+    );
+
     ControlUnit CU(
-        Instr, Mem_data,
+        Mem_out, Mem_data,
         Rs_zero, clk, rst,
         Rd_data, PC_addr,
         ALU_sel, Rd_sel, Rs_sel,
@@ -46,7 +60,7 @@ module RISC_16bit(
         Mem_sel, Mem_read, Mem_write
     );
     ProcessorUnit PU(
-        Instr,
+        Mem_out,
         Rd_data, PC_addr,
         ALU_sel,
         Rd_sel,
@@ -61,9 +75,20 @@ module RISC_16bit(
         PC_addr, Instr[7:0],
         Mem_sel, Mem_read, Mem_write,
         clk,
-        Instr
+        Mem_out
     );
 
+    always@(posedge clk)
+    begin
+        LED = Instr;
+
+        if(Rs_read) begin
+            case(Rs_addr)
+            DISREG[0]: disp_data[15:0] = Mem_data;
+            DISREG[1]: disp_data[15:0] = Mem_data;
+            endcase
+        end
+    end
 endmodule
 
 module ControlUnit (
