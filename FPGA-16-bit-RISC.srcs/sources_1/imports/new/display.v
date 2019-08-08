@@ -20,44 +20,44 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Display (
-    input [31:0] display_data,
-    input clk_in,
-    input en,
+module Display(
+    input [31:0] NUM,
+    input INCLK,
+    input EN,
     output [7:0] SSEG_CA,
     output [7:0] SSEG_AN
     );
-    reg [2:0] count = 3'b000;
-    wire refresh_trigger;
-
-    SlowClock #(2)   D_CLK(clk_in, refresh_trigger);
-    AnodeCon         POS_SEL(count, refresh_trigger, en, SSEG_AN);
-    CathodeCon       DIGIT_SEL(display_data[4*count +: 4], refresh_trigger, en, SSEG_CA);
+    reg [2:0] COUNT = 3'b000;
+    wire CLK;
     
-    always@(posedge refresh_trigger)
+    SlowClock DCLK(INCLK, CLK);
+    POSSEL  SEL(COUNT, CLK, EN, SSEG_AN);
+    DIGIT   D1(NUM[4*COUNT +: 4], CLK, EN, SSEG_CA);
+    
+    always@(posedge CLK)
     begin
-        count = count + 1;
+        COUNT = COUNT + 1;
     end
     
 endmodule
 
-module SlowClock #(parameter clk_ms = 1, ms = 100000) (
+module SlowClock #(parameter cycles = 1, delay = 100000) (
     input INCLK,
     output reg OUTCLK = 0
     );
-    reg [15:0] slow;
+    reg [31:0] slow;
     always@(posedge INCLK)
     begin
-        if(slow < (clk_ms * ms))
+        if(slow < (delay * cycles))
             slow = slow + 1;
         else begin
-            slow = 0;
+            slow = 32'h00000000;
             OUTCLK = ~OUTCLK; // tick every 1 ms
         end
     end
 endmodule
 
-module CathodeCon (
+module DIGIT(
     input [3:0] BIN,
     input CLK,
     input EN,
@@ -95,7 +95,7 @@ module CathodeCon (
     end
 endmodule
 
-module AnodeCon (
+module POSSEL(
     input [2:0] POS,
     input CLK,
     input EN,
