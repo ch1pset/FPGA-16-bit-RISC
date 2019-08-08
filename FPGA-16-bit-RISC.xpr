@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="40" Path="C:/ch1pset/FPGA-16-bit-RISC/FPGA-16-bit-RISC.xpr">
+<Project Version="7" Minor="40" Path="C:/Users/Josh/Programming/Projects/verilog/FPGA-16-bit-RISC/FPGA-16-bit-RISC.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="23d710137d8942009b777c6f43870287"/>
