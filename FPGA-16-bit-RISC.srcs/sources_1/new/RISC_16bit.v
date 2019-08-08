@@ -45,7 +45,7 @@ module RISC_16bit(
     wire IR_load;
     wire Mem_sel, Mem_read, Mem_write;
 
-    SlowClock #(2, 100) SCLK(CLK100MHZ, clk);
+    SlowClock #(2, 10) SCLK(CLK100MHZ, clk);
 
     Display DU(
         disp_data,
@@ -87,8 +87,8 @@ module RISC_16bit(
         LED = Rd_addr;
         if(Rd_write == 1)
             case(Rd_addr)
-                DISREG0: disp_data[15: 0] = Mem_out;
-                DISREG1: disp_data[31:16] = Mem_out;
+                DISREG0: disp_data[15: 0] = Mem_data;
+                DISREG1: disp_data[31:16] = Mem_data;
             endcase
     end
 endmodule

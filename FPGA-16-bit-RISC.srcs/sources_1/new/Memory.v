@@ -42,12 +42,18 @@ module Memory(
         MEM[PROG + 1] = instr(LI,  1, 0, 1);
         MEM[PROG + 2] = instr(ADD, 2, 0, 1);
         MEM[PROG + 3] = instr(SW,  2, 0, DAT);
-        MEM[PROG + 4] = instr(LW, 15, 0, DAT);
-        MEM[PROG + 5] = instr(JMP, 0, 0, PROG);
+        MEM[PROG + 4] = instr(BNZ, 2, 0, PROG + 10);
+        MEM[PROG + 5] = instr(LW,  0, 0, DAT + 1);
+        MEM[PROG + 6] = instr(LI,  1, 0, 1);
+        MEM[PROG + 7] = instr(ADD, 2, 0, 1);
+        MEM[PROG + 8] = instr(SW,  2, 0, DAT + 1);
+        MEM[PROG + 9] = instr(LW, 14, 0, DAT + 1);
+        MEM[PROG +10] = instr(LW, 15, 0, DAT);
+        MEM[PROG +11] = instr(JMP, 0, 0, PROG);
 
         // Data Memory
         MEM[DAT + 0] = 0;
-        MEM[DAT + 1] = 16'hffff;
+        MEM[DAT + 1] = 0;
     end
 
     always@(posedge clk)
