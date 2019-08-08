@@ -32,28 +32,22 @@ module Memory(
               LI = 8, LW = 9, SW = 10, BIZ = 11,
               BNZ = 12, JAL = 13, JMP = 14, JR = 15,
 
-              PROG = 0, DAT = 64, DISP = 240;
+              PROG = 0, DAT = 64;
     reg [15:0] MEM [255:0];
     
     initial
     begin
         // Program Memory
-        MEM[PROG + 0] = instr(LW,  0, 0, DAT + 0);
-        MEM[PROG + 1] = instr(LW,  1, 0, DAT + 1);
-        // MEM[PROG + 2] = instr();
-        MEM[PROG + 3] = instr(SUB, 2, 0, 1);
-        MEM[PROG + 4] = instr(SW,  2, 0, DAT + 2);
-        MEM[PROG + 5] = instr(BNZ, 2, 0, PROG + 0);
-        // MEM[PROG + 6] = instr();
-        MEM[PROG + 7] = 16'ha307;
+        MEM[PROG + 0] = instr(LW,  0, 0, DAT);
+        MEM[PROG + 1] = instr(LI,  1, 0, 1);
+        MEM[PROG + 2] = instr(ADD, 2, 0, 1);
+        MEM[PROG + 3] = instr(SW,  2, 0, DAT);
+        MEM[PROG + 4] = instr(LW, 15, 0, DAT);
+        MEM[PROG + 5] = instr(JMP, 0, 0, PROG);
 
         // Data Memory
-        MEM[DAT + 0] = 16'ha0a0;
-        MEM[DAT + 1] = 16'h0f0f;
-
-        // Display Memory
-        MEM[DISP + 0] = 0;
-        MEM[DISP + 1] = 0;
+        MEM[DAT + 0] = 0;
+        MEM[DAT + 1] = 16'hffff;
     end
 
     always@(posedge clk)
