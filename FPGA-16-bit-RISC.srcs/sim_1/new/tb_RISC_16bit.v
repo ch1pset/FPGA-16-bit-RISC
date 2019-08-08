@@ -77,7 +77,7 @@ module tb_RISC_16bit( );
         UUT1.MU.RAM.MEM[12] = instr( JMP,  0,   0, 8'h00     );
         UUT1.MU.RAM.MEM[13] = instr( JR,   0,   15,0         );
 
-        #400 $finish;
+        #800 $finish;
     end
 
     always #1 clk = ~clk;
@@ -87,12 +87,5 @@ module tb_RISC_16bit( );
     input [7:0] rt;
     instr = (op << 12) + (rd << 8) + (rs << 4) + rt;
     endfunction
-
-    task toggleRst;
-    begin
-        #1 rst = 0;
-        #1 rst = 1;
-    end
-    endtask
 
 endmodule

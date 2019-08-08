@@ -76,29 +76,17 @@ module tb_Controller( );
     initial
     begin
         Instr = 16'h0201;
-        #1 rst = 1;
         nextInstr(16'h2201);
-        toggleRst();
         nextInstr(16'h5300);
-        toggleRst();
         nextInstr(16'h6300);
-        toggleRst();
         nextInstr(16'h84ab);
-        toggleRst();
         nextInstr(16'h94a0);
-        toggleRst();
         nextInstr(16'ha5a0);
-        toggleRst();
         nextInstr(16'hb501);
-        toggleRst();
         nextInstr(16'hc501);
-        toggleRst();
         nextInstr(16'hd6a0);
-        toggleRst();
         nextInstr(16'he0a0);
-        toggleRst();
-        nextInstr(16'hf0a0);
-        toggleRst();        
+        nextInstr(16'hf0a0);   
         #320 $finish;
     end
 
@@ -107,14 +95,7 @@ module tb_Controller( );
     task nextInstr;
     input [15:0] word;
     begin
-        #14 Instr = word;
-    end
-    endtask
-
-    task toggleRst;
-    begin
-        #1 rst = 0;
-        #1 rst = 1;
+        #16 Instr = word;
     end
     endtask
 
