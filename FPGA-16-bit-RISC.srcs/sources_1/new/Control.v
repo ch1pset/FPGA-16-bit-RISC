@@ -73,11 +73,13 @@ module Controller (
 
         case(state)
         S_idle: begin
-            state = S_fet0;
-            Mem_sel = M_PC;
-            IR_sel = IR_mem;
-            Rs_sel = Rs_src;
-            Mem_read = 1;
+            if(~rst) begin 
+                state = S_fet0;
+                Mem_sel = M_PC;
+                IR_sel = IR_mem;
+                Rs_sel = Rs_src;
+                Mem_read = 1;
+            end
         end
 
         S_fet0: begin
