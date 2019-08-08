@@ -39,7 +39,7 @@ module Controller (
                 LI      = 8, LW     = 9,  SW        = 10, BIZ   = 11,
                 BNZ     = 12,JAL    = 13, JMP       = 14, JR    = 15,
                 //States
-                S_idle  = 0, //Idle state
+                S_start  = 0, //Idle state
                 S_fet0  = 1, S_fet1  = 2, //fetch state
                 S_dec   = 3, //decode state
                 S_ex0   = 4, S_ex1   = 5, S_ex2     = 6, //execute state
@@ -72,7 +72,7 @@ module Controller (
         IR_load = 0;
 
         case(state)
-        S_idle: begin
+        S_start: begin
             if(~rst) begin 
                 state = S_fet0;
                 Mem_sel = M_PC;
@@ -167,7 +167,7 @@ module Controller (
         end
 
         S_done: begin
-            state = S_idle;
+            state = S_start;
             Rd_sel = Rd_ALU;
             Rs_sel = Rs_src;
             Mem_sel = M_PC;

@@ -25,7 +25,7 @@ module RISC_16bit(
     output reg [15:0] LED,
     output [7:0] CA, AN
     );
-    parameter DISREG = 4'hf;
+    parameter DISREG0 = 4'hf, DISREG1 = 4'he;
 
     wire clk;
     wire rst = BTNC;
@@ -85,12 +85,11 @@ module RISC_16bit(
     always@(posedge clk)
     begin
         LED = Rd_addr;
-        case(Rd_addr)
-            DISREG: begin
-                if(Rd_write == 1)
-                    disp_data[15:0] = Mem_out;
-            end
-        endcase
+        if(Rd_write == 1)
+            case(Rd_addr)
+                DISREG0: disp_data[15: 0] = Mem_out;
+                DISREG1: disp_data[31:16] = Mem_out;
+            endcase
     end
 endmodule
 
