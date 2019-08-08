@@ -25,11 +25,13 @@ module RISC_16bit(
     output reg [15:0] LED,
     output [7:0] CA, AN
     );
-    parameter [1:0] DISREG = { 14, 15 };
+    parameter DISREG = 4'hf;
 
-    wire clk = CLK100MHZ, rst = BTNC;
+    wire clk;
+    wire rst = BTNC;
 
     reg [31:0] disp_data;
+
     wire [15:0] Mem_out, Mem_data;
     wire Rs_zero;
     wire [7:0] PC_addr, Offset_out, Rd_data;
@@ -43,9 +45,11 @@ module RISC_16bit(
     wire IR_load;
     wire Mem_sel, Mem_read, Mem_write;
 
+    SlowClock #(2, 100) SCLK(CLK100MHZ, clk);
+
     Display DU(
         disp_data,
-        clk,
+        CLK100MHZ,
         1,
         CA, AN
     );
@@ -72,7 +76,7 @@ module RISC_16bit(
     );
     MemoryUnit MU(
         Mem_data,
-        PC_addr, Instr[7:0],
+        PC_addr, Mem_out[7:0],
         Mem_sel, Mem_read, Mem_write,
         clk,
         Mem_out
@@ -80,14 +84,13 @@ module RISC_16bit(
 
     always@(posedge clk)
     begin
-        LED = Instr;
-
-        if(Rs_read) begin
-            case(Rs_addr)
-            DISREG[0]: disp_data[15:0] = Mem_data;
-            DISREG[1]: disp_data[15:0] = Mem_data;
-            endcase
-        end
+        LED = Rd_addr;
+        case(Rd_addr)
+            DISREG: begin
+                if(Rd_write == 1)
+                    disp_data[15:0] = Mem_out;
+            end
+        endcase
     end
 endmodule
 
