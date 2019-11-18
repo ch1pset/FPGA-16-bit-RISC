@@ -3,3 +3,8 @@
 *.ip_user_files/
 *.sim/
 *.runs/
+*.Xil/
+project_files/*
+*.log
+*.jou
+*.str
