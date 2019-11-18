@@ -27,7 +27,7 @@ module ALU (
     );
     parameter   ADD = 0, SUB = 1, AND = 2, OR  = 3,
                 XOR = 4, NOT = 5, SHL = 6, SHR = 7;
-    always@(OP, A, B)
+    always@(*)
     begin
         case(OP)
         ADD:   Data = A + B;

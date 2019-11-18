@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module RegisterFile(
+module RegisterFile #(parameter DATA_WIDTH=16, ADDR_WIDTH=4)(
     input [15:0] dest_data,
     input [3:0] dest_addr,
     input dest_write,
@@ -32,18 +32,18 @@ module RegisterFile(
     output reg [15:0] src_data = 0, tar_data = 0,
     output src_zero
     );
-    reg [15:0] REG [15:0];
+    reg [DATA_WIDTH-1:0] REG [(2**ADDR_WIDTH)-1:0];
     integer i = 0;
-    initial for(i = 0; i < 16; i = i + 1) REG[i] = 0;
+//    initial for(i = 0; i < (2**ADDR_WIDTH); i = i + 1) REG[i] = 0;
 
     assign src_zero = (src_data == 0);
 
     always@(posedge clk)
     begin
-        if(dest_write) REG[dest_addr] = dest_data;
+        if(dest_write) REG[dest_addr] <= dest_data;
 
-        if(src_read) src_data = REG[src_addr];
+        if(src_read) src_data <= REG[src_addr];
 
-        if(tar_read) tar_data = REG[tar_addr];
+        if(tar_read) tar_data <= REG[tar_addr];
     end
 endmodule

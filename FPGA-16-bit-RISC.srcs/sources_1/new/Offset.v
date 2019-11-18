@@ -21,15 +21,9 @@
 
 
 module Offset(
-    input [7:0] instr_ptr,
-    input [7:0] offset_addr,
-    output [7:0] instr_off_ptr
+    input [7:0] pc_in,
+    input [7:0] offset,
+    output [7:0] pc_out
     );
-    wire [7:0] offset, pc, bg, sm;
-    assign pc = instr_ptr - 1;
-    wire sign = (offset_addr > pc);
-    Mux_2 #(8) set_bg(offset_addr, pc, sign, bg);
-    Mux_2 #(8) set_sm(pc, offset_addr, sign, sm);
-    assign offset = bg - sm;
-    Mux_2 #(8) shift_mux((pc + offset), (pc - offset), sign,   instr_off_ptr);
+    assign pc_out = pc_in + offset;
 endmodule

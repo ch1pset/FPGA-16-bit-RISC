@@ -27,9 +27,9 @@ module Program_Counter(in, PC_ld, PC_clr, PC_inc, clk, count);
 
     always@(posedge clk)
     begin
-        if (PC_clr==1) count = 8'h00;
-        else if (PC_inc==1) count = count+1;
-        else if (PC_ld==1) count = in;
+        if (PC_clr==1) count <= 8'h00;
+        else if (PC_inc==1) count <= count+1;
+        else if (PC_ld==1) count <= in;
     end
 
 endmodule

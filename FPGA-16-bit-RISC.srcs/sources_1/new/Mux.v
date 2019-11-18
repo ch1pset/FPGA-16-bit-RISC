@@ -19,19 +19,6 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-module RF_Mux (
-    input [15:0] bus3, bus2, bus1, bus0,
-    input [1:0] sel,
-    output [15:0] dout
-    );
-    wire [15:0] sign_extend;
-    assign sign_extend[15] = bus2[7];
-    assign sign_extend[14:7] = 8'h00;
-    assign sign_extend[6:0] = (~bus2[6:0]) + 1;
-
-    Mux_4 #(16) M0(bus3, sign_extend, bus1, bus0, sel, dout);
-endmodule
-
 module Mux_4 #(parameter WIDTH=8) (
     input [WIDTH-1:0] bus3, bus2, bus1, bus0,
     input [1:0] sel,
